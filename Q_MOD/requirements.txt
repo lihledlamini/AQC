@@ -1,0 +1,15 @@
+pip install pennylanne
+pip install scipy
+pip install colorama
+pip install streamlit
+pip install python-socketio
+pip install eventlet
+pip install opencv-python
+pip install onnx
+pip install onnxruntime
+pip install asyncio
+pip install websockets
+pip install matplotlib
+pip install argparse
+pip install pywin32
+
