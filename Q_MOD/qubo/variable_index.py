@@ -1,21 +1,27 @@
-# qubo/qubo_builder.py
-import numpy as np
-from encoding.discretization import binary_weights
+# qubo/variable_index.py
 
 
-class QUBOBuilder:
-def __init__(self, n):
-self.Q = np.zeros((n, n))
+def build_variable_index(nodes, edges, bits_per_var):
+    index = {}
+    reverse = {}
+    counter = 0
 
 
-def add_linear(self, i, v):
-self.Q[i, i] += v
+    for i in nodes:
+        for var in ['g', 's', 'u', 'x']:
+            K = bits_per_var.get((var, i), 1)
+            for k in range(K):
+                index[(var, i, k)] = counter
+                reverse[counter] = (var, i, k)
+                counter += 1
 
 
-def add_quadratic(self, i, j, v):
-a, b = min(i, j), max(i, j)
-self.Q[a, b] += v
+    for (i, j) in edges:
+        K = bits_per_var.get(('f', i, j), 1)
+        for k in range(K):
+            index[("f", (i,j), k)] = counter
+            reverse[counter] = ("f", (i,j), k)
+            counter += 1
 
 
-def matrix(self):
-return self.Q
+    return index, reverse, counter
