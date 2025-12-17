@@ -5,7 +5,7 @@
 ```mermaid
 flowchart TD
     A["Start<br/>run_pipeline.py"]
-    B["load_pseudo_dataset()<br/>nodes, edges, demand"]
+    B["load_dataset()<br/>nodes, edges, demand"]
     C["build_variable_index()<br/>bit → qubit"]
     D["QUBOBuilder()"]
     E["add_linear()<br/>costs & penalties"]
