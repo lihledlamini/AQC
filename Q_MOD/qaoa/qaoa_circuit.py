@@ -4,7 +4,7 @@ from qaoa.mixers import x_mixer, xy_mixer
 
 def build_qaoa(H, p, mixer="X", pairs=None, return_state=False):
     wires = list(H.wires)
-    dev = qml.device("default.qubit", wires=wires)
+    dev = qml.device("lightning.kokkos", wires=wires)
 
     @qml.qnode(dev)
     def circuit(params):

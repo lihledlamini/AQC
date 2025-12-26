@@ -1,0 +1,14 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Spyder project files
+.spyproject/
+
+# Virtual environments
+.env/
+.venv/
+venv/
+
+# OS junk
+.DS_Store
