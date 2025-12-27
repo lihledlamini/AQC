@@ -7,19 +7,61 @@ from qubo.qubo_builder import QUBOBuilder
 from hamiltonian.qubo_to_ising import qubo_to_ising
 from qaoa.qaoa_circuit import build_qaoa
 
+def build_qubo(index, dataset, bits):
+    Q = QUBOBuilder(len(index))
+
+    W_balance = 10.0  # MUST be positive
+
+    for node in dataset["nodes"]:
+        L = dataset["L"].get(node, 0)
+
+        # ---- Generation cost ----
+        for k in range(bits.get(('g', node), 1)):
+            Q.add_linear(
+                index[('g', node, k)],
+                dataset["c_gen"].get(node, 0)
+            )
+
+        # ---- Renewable incentive ----
+        for k in range(bits.get(('u', node), 1)):
+            Q.add_linear(
+                index[('u', node, k)],
+                -dataset["renewables"].get(node, 0)
+            )
+
+        # ---- Power balance penalty ----
+        if L > 0:
+            g_bits = [index[('g', node, k)]
+                      for k in range(bits.get(('g', node), 1))]
+            u_bits = [index[('u', node, k)]
+                      for k in range(bits.get(('u', node), 1))]
+
+            all_bits = g_bits + u_bits
+
+            # Linear terms: +W x_i - 2W L x_i
+            for i in all_bits:
+                Q.add_linear(i, W_balance)          # x_i^2 term
+                Q.add_linear(i, -2 * W_balance * L)
+
+            # Quadratic coupling: +2W x_i x_j
+            for i in range(len(all_bits)):
+                for j in range(i + 1, len(all_bits)):
+                    Q.add_quadratic(
+                        all_bits[i],
+                        all_bits[j],
+                        2 * W_balance
+                    )
+
+    return Q.matrix()
+
+
 # Load data
-data = load_pseudo_dataset()
-nodes, edges = data["nodes"], data["edges"]
+dataset = load_pseudo_dataset()
+nodes, edges = dataset["nodes"], dataset["edges"]
 
 bits = {('g',3):3, ('u',3):2}
 index, rev, n = build_variable_index(nodes, edges, bits)
-
-# Example minimal QUBO
-Q = QUBOBuilder(n)
-Q.add_linear(index[('g',3,0)], 1.8)
-Q.add_linear(index[('u',3,0)], -25 * data['L'][3])
-
-Qmat = Q.matrix()
+Qmat = build_qubo(index, dataset, bits)
 
 # Hamiltonian
 H = qubo_to_ising(Qmat)
@@ -73,9 +115,10 @@ solution_mapping = map_bitstring_to_dataset(bitstring, rev)
 dataset = load_pseudo_dataset()
 node_summary = {}
 for (typ, node, idx), val in solution_mapping.items():
-    if node not in node_summary:
-        node_summary[node] = {}
-    node_summary[node][typ] = val
+    if typ in ['g', 'u']:  # only generator or renewable
+        if node not in node_summary:
+            node_summary[node] = {}
+        node_summary[node][typ] = val
 
 # --- Print summary with costs ---
 for node, info in node_summary.items():

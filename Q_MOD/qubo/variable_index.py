@@ -1,6 +1,4 @@
 # qubo/variable_index.py
-
-
 def build_variable_index(nodes, edges, bits_per_var):
     index = {}
     reverse = {}
