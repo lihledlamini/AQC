@@ -59,7 +59,14 @@ def build_qubo(index, dataset, bits):
 dataset = load_pseudo_dataset()
 nodes, edges = dataset["nodes"], dataset["edges"]
 
-bits = {('g',3):3, ('u',3):2}
+# Number of qubits for each node’s generator and renewable
+bits = {
+    ('g', 1): 2, ('u', 1): 1,
+    ('g', 2): 2, ('u', 2): 1,
+    ('g', 3): 3, ('u', 3): 2,
+    ('g', 4): 2, ('u', 4): 1
+}
+
 index, rev, n = build_variable_index(nodes, edges, bits)
 Qmat = build_qubo(index, dataset, bits)
 
