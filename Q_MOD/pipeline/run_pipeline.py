@@ -70,6 +70,8 @@ bits = {
 index, rev, n = build_variable_index(nodes, edges, bits)
 Qmat = build_qubo(index, dataset, bits)
 
+print("Required Qubits: "+str(n))
+
 # Hamiltonian
 H = qubo_to_ising(Qmat)
 # QAOA
@@ -97,11 +99,11 @@ print("Probability:", probs[idx])
 
 ################### Classical, future test sand box
 print ('Running Classical :----------------------')
-Hmat = qml.matrix(H)
-eigvals, eigvecs = np.linalg.eigh(Hmat)
-print("Exact ground energy:", eigvals[0])
-fidelity = np.abs(np.vdot(eigvecs[:, 0], state))**2
-print("Fidelity:", fidelity)
+#Hmat = qml.matrix(H)
+#eigvals, eigvecs = np.linalg.eigh(Hmat)
+#print("Exact ground energy:", eigvals[0])
+#fidelity = np.abs(np.vdot(eigvecs[:, 0], state))**2
+#print("Fidelity:", fidelity)
 
 ################## Mapping back to database############
 def map_bitstring_to_dataset(bitstring, rev):
